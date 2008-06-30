@@ -296,9 +296,14 @@ use overload
 
     '""' => sub { "${$_[0]}" };
 
+use Carp;
+
 sub new {
     my ($class, $value) = @_;
     $value = 0 if @_ == 1;
+
+    croak "value is not an integer" if $value !~ m/^[+-]?\d+$/;
+
     return bless \$value, $class;
 }
 
