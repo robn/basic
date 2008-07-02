@@ -335,7 +335,7 @@ sub print_handler {
 sub run_handler {
     my ($st) = @_;
 
-    if ($st->{"expression(?)"}) {
+    if (exists $st->{"expression(?)"}->[0]) {
         execute_from(expand_expression($st->{"expression(?)"}->[0]));
     }
     else {
