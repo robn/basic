@@ -107,11 +107,25 @@ sub execute_from {
 
         my $cur = $pos+$len/2;
 
-        return $cur if $linenos[$cur] == $want;
-        return $_find_array_pos->($want, 0, $cur) if $linenos[$cur] < $want;
-        return $_find_array_pos->($want, $cur, scalar @linenos) if $linenos[$cur] < $want;
+        given ($linenos[$cur]) {
+            
+            when ($_ == $want) {
+                return;
+            }
 
-        return;
+            when ($_ < $want) {
+                return $_find_array_pos->($want, 0, $cur);
+            }
+
+            when ($_ > $want) {
+                return $_find_array_pos->($want, $cur, scalar @linenos);
+            }
+
+            default {
+                return;
+            }
+
+        }
     };
 
     $pc = $_[0] // undef;
