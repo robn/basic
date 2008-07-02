@@ -105,20 +105,22 @@ sub execute_from {
     $_find_array_pos = sub {
         my ($want, $pos, $len) = @_;
 
-        my $cur = $pos+$len/2;
+        my $cur = $pos + ($len >> 1);
+
+        return if $len == 0 || $cur > $#linenos;
 
         given ($linenos[$cur]) {
             
             when ($_ == $want) {
-                return;
-            }
-
-            when ($_ < $want) {
-                return $_find_array_pos->($want, 0, $cur);
+                return $cur;
             }
 
             when ($_ > $want) {
-                return $_find_array_pos->($want, $cur, scalar @linenos);
+                return $_find_array_pos->($want, 0, $cur);
+            }
+
+            when ($_ < $want) {
+                return $_find_array_pos->($want, $cur+1, @linenos-$cur-1);
             }
 
             default {
@@ -136,7 +138,7 @@ sub execute_from {
         $pos = 0;
     }
     else {
-        $pos = $_find_array_pos->($pc, 0, $#linenos);
+        $pos = $_find_array_pos->($pc, 0, scalar @linenos);
         return if not defined $pos;
     }
 
@@ -151,7 +153,7 @@ sub execute_from {
         }
 
         elsif (defined $pc) {
-            $pos = $_find_array_pos->($pc, 0, $#linenos);
+            $pos = $_find_array_pos->($pc, 0, scalar @linenos);
             return if not defined $pos;
         }
 
