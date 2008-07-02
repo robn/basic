@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 
+use 5.010;
 use warnings;
 use strict;
 
@@ -113,7 +114,7 @@ sub execute_from {
         return;
     };
 
-    $pc = $_[0] if $#_ > 0;
+    $pc = $_[0] // undef;
     my $pos;
 
     if (not defined $pc) {
