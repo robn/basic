@@ -332,7 +332,13 @@ sub print_handler {
         }
     }
 
-    print "$out\n";
+    if ($st->{__PATTERN2__}) {
+        local $| = 1;
+        print $out;
+    }
+    else {
+        say $out;
+    }
 }
 
 sub run_handler {
@@ -439,7 +445,7 @@ input_statement:    INPUT identifier(s /,/)
 let_statement:      LET(?) identifier "=" expression
 next_statement:     NEXT identifier
 new_statement:      NEW
-print_statement:    PRINT expression(s? /;/)
+print_statement:    PRINT expression(s? /;/) /;?/
 read_statement:     READ identifier(s)
 rem_statement:      REM /.*/
 restore_statement:  RESTORE
