@@ -58,6 +58,7 @@ my $p = do { local $/; Parse::RecDescent->new(<DATA>) };
 
 my %lines;
 my %vars;
+my $pc;
 
 while (my $raw = prompt "basic> ", -line) {
     $raw = "$raw";
@@ -91,6 +92,57 @@ sub execute {
     for my $st (@{$statements}) {
         my ($type) = grep { /_statement$/ } keys %{$st};
         $handlers{$type}->($st->{$type});
+    }
+}
+
+sub execute_from {
+    return if scalar keys %lines == 0;
+
+    my @linenos = sort { $a <=> $b } keys %lines;
+
+    my $_find_array_pos;
+    $_find_array_pos = sub {
+        my ($want, $pos, $len) = @_;
+
+        my $cur = $pos+$len/2;
+
+        return $cur if $linenos[$cur] == $want;
+        return $_find_array_pos->($want, 0, $cur) if $linenos[$cur] < $want;
+        return $_find_array_pos->($want, $cur, scalar @linenos) if $linenos[$cur] < $want;
+
+        return;
+    };
+
+    $pc = $_[0] if $#_ > 0;
+    my $pos;
+
+    if (not defined $pc) {
+        $pc = $linenos[0];
+        $pos = 0;
+    }
+    else {
+        $pos = $_find_array_pos->($pc, 0, $#linenos);
+        return if not defined $pos;
+    }
+
+    while (defined $pc) {
+        my $curpc = $pc;
+        execute($lines{$curpc});
+
+        if ($pc == $curpc) {
+            return if $pos == $#linenos;
+
+            $pc = $linenos[$pos++];
+        }
+
+        elsif (defined $pc) {
+            $pos = $_find_array_pos->($pc, 0, $#linenos);
+            return if not defined $pos;
+        }
+
+        else {
+            return;
+        }
     }
 }
 
@@ -261,6 +313,12 @@ sub print_handler {
     }
 
     print "$out\n";
+}
+
+sub run_handler {
+    my ($st) = @_;
+
+    execute_from();
 }
 
 
