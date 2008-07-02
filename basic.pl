@@ -335,7 +335,12 @@ sub print_handler {
 sub run_handler {
     my ($st) = @_;
 
-    execute_from();
+    if ($st->{"expression(?)"}) {
+        execute_from(expand_expression($st->{"expression(?)"}->[0]));
+    }
+    else {
+        execute_from();
+    }
 }
 
 
@@ -436,7 +441,7 @@ read_statement:     READ identifier(s)
 rem_statement:      REM /.*/
 restore_statement:  RESTORE
 return_statement:   RETURN
-run_statement:      RUN
+run_statement:      RUN expression(?)
 stop_statement:     STOP
 
 statement: continue_statement
