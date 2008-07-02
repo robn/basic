@@ -447,7 +447,7 @@ sigil: '$'
 
 identifier: /[a-zA-Z](?:[a-zA-Z0-9])*/ sigil(?)
 
-string: '"' /(?:\\"|[^"])*/ '"'
+string: '"' <skip:''> /(?:\\"|[^"])*/ '"'
 integer: /-?\d+/
 
 literal: integer | string
