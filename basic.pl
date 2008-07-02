@@ -130,7 +130,9 @@ sub execute_from {
         }
     };
 
-    $pc = $_[0] // undef;
+    undef $pc;
+    $pc = $_[0] if @_ > 0;
+
     my $pos;
 
     if (not defined $pc) {
@@ -149,7 +151,8 @@ sub execute_from {
         if ($pc == $curpc) {
             return if $pos == $#linenos;
 
-            $pc = $linenos[$pos++];
+            $pos++;
+            $pc = $linenos[$pos];
         }
 
         elsif (defined $pc) {
